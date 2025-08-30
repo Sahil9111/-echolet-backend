@@ -26,12 +26,17 @@ const userSchema = new mongoose.Schema(
             // required: true,
             default: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"
         },
-        bio: { type: String }
+        bio: {
+            type: String
+        },
+        refreshToken: {
+            type: String
+        }
     },
     { timestamps: true }
 )
 
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
         return next();
     }
@@ -40,17 +45,17 @@ userSchema.pre('save', async function(next) {
     next();
 });
 
-userSchema.methods.matchPassword = async function(enteredPassword) {
+userSchema.methods.matchPassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
-userSchema.methods.generateToken = function() {
+userSchema.methods.generateToken = function () {
     return jwt.sign({ id: this._id, email: this.email, username: this.username }, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: process.env.ACCESS_TOKEN_SECRET_EXPIRES_IN,
     });
 }
 
-userSchema.methods.generateRefreshToken = function() {
+userSchema.methods.generateRefreshToken = function () {
     return jwt.sign({ id: this._id }, process.env.REFRESH_TOKEN_SECRET, {
         expiresIn: process.env.REFRESH_TOKEN_SECRET_EXPIRES_IN,
     });
