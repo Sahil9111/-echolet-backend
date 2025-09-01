@@ -1,6 +1,9 @@
 import asyncHandler from '../utils/asyncHandler.js';
 import User from '../models/user.model.js';
 import { uploadToCloudinary } from '../utils/cloudinary.js';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config({quiet: true});
 
 const generateAccessAndRefreshToken = async (userId) => {
     try {
@@ -103,6 +106,36 @@ const logoutUser = asyncHandler(async (req, res) => {
     res.status(200).json({ message: "User logged out successfully" });
 });
 
+const refreshAccessToken = asyncHandler(async (req, res) => {
+    const incommingRefreshToken  = req.cookies.refreshToken || req.body.refreshToken;
+    if (!incommingRefreshToken) {
+        res.status(400);
+        throw new Error("No refresh token provided");
+    }
+    try {
+        const decodedToken = jwt.verify(incommingRefreshToken, process.env.REFRESH_TOKEN_SECRET)
+        if (!decodedToken || !decodedToken.id) {
+            res.status(401);
+            throw new Error("Invalid refresh token");
+        }
+        const user = await User.findById(decodedToken.id);
+        if (!user || user.refreshToken !== incommingRefreshToken) {
+            res.status(401);
+            throw new Error("Invalid refresh token");
+        }
+       const options = {
+            httpOnly: true,
+            secure: true
+        };
+        const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
+        return res.status(200).cookie('accessToken', accessToken, options).cookie('refreshToken', refreshToken, options).json({ message: "Access token refreshed successfully", accessToken, refreshToken })
+    } catch (error) {
+        res.status(401);
+        throw new Error("Invalid refresh token");
+    }
+})
 
 
-export { registerUser, loginUser, logoutUser };
+
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken };
