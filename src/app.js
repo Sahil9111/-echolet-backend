@@ -15,9 +15,11 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 // Routes import
-import userRouter from './routes/user.route.js' 
+import userRouter from './routes/user.route.js'
+import chatRouter from './routes/chat.route.js'
 
 // Routes declaration
 app.use('/api/v1/user', userRouter);
+app.use('/api/v1/chat', chatRouter);
 
 export default app;

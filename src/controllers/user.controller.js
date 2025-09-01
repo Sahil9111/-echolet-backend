@@ -71,7 +71,6 @@ const loginUser = asyncHandler(async (req, res) => {
     } 
 
     const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user._id);
-    // console.log(accessToken, refreshToken);
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken -__v");
 
     const options = {
@@ -135,7 +134,18 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     }
 })
 
+const allUsers = asyncHandler(async (req, res) => {
+    const keyword = req.query.search ? {
+        $or: [
+            { username: { $regex: req.query.search, $options: "i" } },
+            { email: { $regex: req.query.search, $options: "i" } }
+        ]
+    } : {}; 
+    const users = await User.find(keyword).find({ _id: { $ne: req.user._id } }).select("-password -refreshToken -__v");
+    res.status(200).json(users);
+});
 
 
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken };
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken, allUsers };
