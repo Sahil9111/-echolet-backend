@@ -44,25 +44,23 @@ const accessChat = asyncHandler(async (req, res) => {
 });
 
 const fetchChat = asyncHandler(async (req, res) => {
-    //   Fetch chat logic here
     try {
-        Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
-        .populate("users", "-password -refreshToken -__v")
-        .populate("groupAdmin", "-password -refreshToken -__v")
-        .populate("latestMessage")
-        .sort({ updatedAt: -1 })
-        .then(async (results) => {
-            results = await Chat.populate(results, {
-                path: "latestMessage.sender",
-                select: "username email profileImage",
-            });
-            res.status(200).json(results);
+        let results = await Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
+            .populate("users", "-password -refreshToken -__v")
+            .populate("groupAdmin", "-password -refreshToken -__v")
+            .populate("latestMessage")
+            .sort({ updatedAt: -1 });
+
+        results = await Chat.populate(results, {
+            path: "latestMessage.sender",
+            select: "username email profileImage",
         });
-                    
+
+        res.status(200).json(results);
     } catch (error) {
-        
+        console.error("Error in fetchChat:", error.message);
+        res.status(500).json({ error: "Server error while fetching chats" });
     }
-    
 });
 
 const createGroupChat = asyncHandler(async (req, res) => {
