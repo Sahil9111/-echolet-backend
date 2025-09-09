@@ -6,7 +6,7 @@ dotenv.config({quiet: true});
 
 
 const verifyUser = asyncHandler(async (req, res, next) => {
-    const token = req.cookies?.accessToken || req.headers("Authorization")?.replace("Bearer " ,"");
+    const token = req.cookies?.accessToken || req.headers["authorization"]?.replace("Bearer " ,"");
     if (!token) {
         res.status(401);
         throw new Error("Not authorized, no token");
