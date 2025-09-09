@@ -75,7 +75,8 @@
 
         const options = {
             httpOnly: true,
-            secure: true
+            secure: true,
+            sameSite: "none"
         };
         return res.status(200).cookie('accessToken', accessToken, options).cookie('refreshToken', refreshToken, options).json({ message: "User logged in successfully", user: loggedInUser, accessToken, refreshToken })
 
@@ -98,6 +99,7 @@
         const options = {
             httpOnly: true,
             secure: true,
+            sameSite: "none",
             expires: new Date(0)
         };
         res.clearCookie('accessToken', options);
@@ -124,7 +126,8 @@
             }
             const options = {
                 httpOnly: true,
-                secure: true
+                secure: true,
+                sameSite: "none",
             };
             const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
             return res.status(200).cookie('accessToken', accessToken, options).cookie('refreshToken', refreshToken, options).json({ message: "Access token refreshed successfully", accessToken, refreshToken })
