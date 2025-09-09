@@ -2,17 +2,9 @@ import express from 'express';
 import cors from 'cors'
 import cookieParser from 'cookie-parser';
 
-// import { Server } from 'socket.io';
+
 
 const app = express()
-// const server = http.createServer(app);
-// const server = createServer(app);
-// const io = new Server(server, {
-//     pingTimeout: 60000,
-//     cors: {
-//         origin: process.env.CORS_ORIGIN
-//     }
-// });
 
 
 app.use(cors({
@@ -34,8 +26,6 @@ import messageRouter from './routes/message.route.js'
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/chat', chatRouter);
 app.use('/api/v1/message', messageRouter);
-// io.on('connection', (socket) => {
-//     console.log('a user connected');
-// });
+
 
 export default app;
