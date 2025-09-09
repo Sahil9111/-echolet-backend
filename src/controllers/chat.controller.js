@@ -1,6 +1,5 @@
 import asyncHandler from '../utils/asyncHandler.js';
 import Chat from '../models/chat.model.js';
-import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config({ quiet: true });
 

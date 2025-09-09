@@ -3,7 +3,7 @@ import User from '../models/user.model.js';
 import { uploadToCloudinary } from '../utils/cloudinary.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-dotenv.config({quiet: true});
+dotenv.config({ quiet: true });
 
 const generateAccessAndRefreshToken = async (userId) => {
     try {
@@ -68,27 +68,27 @@ const loginUser = asyncHandler(async (req, res) => {
     if (!user || !(await user.matchPassword(password))) {
         res.status(401);
         throw new Error("Invalid email or password");
-    } 
+    }
 
-    const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user._id);
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken -__v");
 
     const options = {
         httpOnly: true,
         secure: true
     };
-    return res.status(200).cookie('accessToken', accessToken, options).cookie('refreshToken', refreshToken, options).json({ message: "User logged in successfully", user: loggedInUser, accessToken, refreshToken })   
+    return res.status(200).cookie('accessToken', accessToken, options).cookie('refreshToken', refreshToken, options).json({ message: "User logged in successfully", user: loggedInUser, accessToken, refreshToken })
 
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
     //   Logout logic here
-    const { refreshToken } = req.cookies;   
+    const { refreshToken } = req.cookies;
     if (!refreshToken) {
         res.status(400);
         throw new Error("No refresh token provided");
     }
-    const user = await User.findOne({ _id: req.user.id});
+    const user = await User.findOne({ _id: req.user.id });
     if (!user) {
         res.status(400);
         throw new Error("Invalid refresh token");
@@ -106,7 +106,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
-    const incommingRefreshToken  = req.cookies.refreshToken || req.body.refreshToken;
+    const incommingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
     if (!incommingRefreshToken) {
         res.status(400);
         throw new Error("No refresh token provided");
@@ -122,7 +122,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             res.status(401);
             throw new Error("Invalid refresh token");
         }
-       const options = {
+        const options = {
             httpOnly: true,
             secure: true
         };
@@ -140,7 +140,7 @@ const allUsers = asyncHandler(async (req, res) => {
             { username: { $regex: req.query.search, $options: "i" } },
             { email: { $regex: req.query.search, $options: "i" } }
         ]
-    } : {}; 
+    } : {};
     const users = await User.find(keyword).find({ _id: { $ne: req.user._id } }).select("-password -refreshToken -__v");
     res.status(200).json(users);
 });
