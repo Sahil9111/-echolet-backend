@@ -1,0 +1,1 @@
+console.log("here persists all the images to be uploaded")
